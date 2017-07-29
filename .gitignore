@@ -1,13 +1,13 @@
 # BUILD KEIL PRO FILE
- *.uvgui
- *.uvopt
- *.uvproj
+ # *.uvgui
+ # *.uvopt
+ # *.uvproj
  *.ewd
  *.ewp
  *.eww
  *.tags
  *.tags1
- 
+
 
 # Prerequisites
 *.d
