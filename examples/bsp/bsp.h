@@ -20,7 +20,7 @@
  * @details This module provides a layer of abstraction from the board.
  *          It allows the user to indicate certain states on LEDs in a simple way.
  *          Module functionality can be modified by additional defines:
- *          - BSP_SIMPLE reduces functionality of this module to enable 
+ *          - BSP_SIMPLE reduces functionality of this module to enable
  *            and read state of the buttons
  *          - BSP_UART_SUPPORT enables support for UART
  */
@@ -48,7 +48,7 @@
 #endif // BSP_UART_SUPPORT
 
 #define BUTTON_ERASE_BONDING BSP_BUTTON_0_MASK
-#define BUTTON_ERASE_ALL     BSP_BUTTON_1_MASK
+#define BUTTON_ERASE_ALL     BSP_BUTTON_1_MASKW
 #define BUTTON_ADVERTISE     BSP_BUTTON_0_MASK
 #define BUTTON_CLEAR_EVT     BSP_BUTTON_1_MASK
 #define BUTTON_CAPSLOCK      BSP_BUTTON_2_MASK

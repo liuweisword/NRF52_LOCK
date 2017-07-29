@@ -5,6 +5,9 @@
  *.ewd
  *.ewp
  *.eww
+ *.tags
+ *.tags1
+ 
 
 # Prerequisites
 *.d

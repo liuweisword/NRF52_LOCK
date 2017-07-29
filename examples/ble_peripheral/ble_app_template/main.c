@@ -50,6 +50,15 @@
 #include "ble_hci.h"
 #include "ble_advdata.h"
 #include "ble_advertising.h"
+///////////////////////////////////////////////////////////
+
+#include "nrf_delay.h"
+#include "app_uart.h"
+#include "ble_nus.h"
+
+
+
+
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT  1                                          /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
@@ -93,10 +102,28 @@ static ble_xx_service_t                     m_xxs;
 static ble_yy_service_t                     m_yys;
 */
 
+//////////////////////////////////////////////////////////////////////
+
+#define HEART_LED       BSP_LED_3_MASK
+#define UART_TX_BUF_SIZE                256                                         /**< UART TX buffer size. */
+#define UART_RX_BUF_SIZE                256                                         /**< UART RX buffer size. */
+
+static ble_nus_t                        m_nus;
+
+
+
+
+
+
+//////////////////////////////////////////////
+
+
+
+
 // YOUR_JOB: Use UUIDs for service(s) used in your application.
 static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}}; /**< Universally unique service identifiers. */
 
-                                   
+
 /**@brief Callback function for asserts in the SoftDevice.
  *
  * @details This function will be called in case of an assert in the SoftDevice.
@@ -170,7 +197,7 @@ static void gap_params_init(void)
 }
 
 
-/**@brief Function for handling the YYY Service events. 
+/**@brief Function for handling the YYY Service events.
  * YOUR_JOB implement a service handler function depending on the event the service you are using can generate
  *
  * @details This function will be called for all YY Service events which are passed to
@@ -180,7 +207,7 @@ static void gap_params_init(void)
  * @param[in]   p_evt          Event received from the YY Service.
  *
  *
-static void on_yys_evt(ble_yy_service_t     * p_yy_service, 
+static void on_yys_evt(ble_yy_service_t     * p_yy_service,
                        ble_yy_service_evt_t * p_evt)
 {
     switch (p_evt->evt_type)
@@ -188,7 +215,7 @@ static void on_yys_evt(ble_yy_service_t     * p_yy_service,
         case BLE_YY_NAME_EVT_WRITE:
             APPL_LOG("[APPL]: charact written with value %s. \r\n", p_evt->params.char_xx.value.p_str);
             break;
-        
+
         default:
             // No implementation needed.
             break;
@@ -209,8 +236,8 @@ static void services_init(void)
 
     xxs_init.evt_handler                = NULL;
     xxs_init.is_xxx_notify_supported    = true;
-    xxs_init.ble_xx_initial_value.level = 100; 
-    
+    xxs_init.ble_xx_initial_value.level = 100;
+
     err_code = ble_bas_init(&m_xxs, &xxs_init);
     APP_ERROR_CHECK(err_code);
 
@@ -288,7 +315,7 @@ static void application_timers_start(void)
     uint32_t err_code;
     err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code); */
-   
+
 }
 
 
@@ -405,9 +432,9 @@ static void sys_evt_dispatch(uint32_t sys_evt)
 static void ble_stack_init(void)
 {
     uint32_t err_code;
-    
+
     nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
-    
+
     // Initialize the SoftDevice handler module.初始化系统时钟与相关参数
     SOFTDEVICE_HANDLER_INIT(&clock_lf_cfg, NULL);
     //获取默认启动SoftDevice参数
@@ -416,10 +443,10 @@ static void ble_stack_init(void)
                                                     PERIPHERAL_LINK_COUNT,
                                                     &ble_enable_params);
     APP_ERROR_CHECK(err_code);
-    
+
     //Check the ram settings against the used number of links检测内存设置使用的链接数
     CHECK_RAM_START_ADDR(CENTRAL_LINK_COUNT,PERIPHERAL_LINK_COUNT);
-    
+
     // Enable BLE stack.使能协议栈
     err_code = softdevice_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
@@ -561,8 +588,10 @@ static void buttons_leds_init(bool * p_erase_bonds)
     bsp_event_t startup_event;
 
     uint32_t err_code = bsp_init(BSP_INIT_LED | BSP_INIT_BUTTONS,
-                                 APP_TIMER_TICKS(100, APP_TIMER_PRESCALER), 
-                                 bsp_event_handler);//初始化外部设备
+                                 APP_TIMER_TICKS(100, APP_TIMER_PRESCALER),
+                                 bsp_event_handler);//初始化
+
+
     APP_ERROR_CHECK(err_code);
 
     err_code = bsp_btn_ble_init(NULL, &startup_event);//初始化按键触发模式
@@ -580,6 +609,87 @@ static void power_manage(void)
     APP_ERROR_CHECK(err_code);
 }
 
+void local_led_init(void)
+{
+    LEDS_CONFIGURE(HEART_LED);
+    LEDS_OFF(HEART_LED);
+}
+
+
+/**@brief   Function for handling app_uart events.
+ *
+ * @details This function will receive a single character from the app_uart module and append it to
+ *          a string. The string will be be sent over BLE when the last character received was a
+ *          'new line' i.e '\n' (hex 0x0D) or if the string has reached a length of
+ *          @ref NUS_MAX_DATA_LENGTH.
+ */
+/**@snippet [Handling the data received over UART] */
+void uart_event_handle(app_uart_evt_t * p_event)
+{
+    static uint8_t data_array[BLE_NUS_MAX_DATA_LEN];
+    static uint8_t index = 0;
+    uint32_t       err_code;
+
+    switch (p_event->evt_type)
+    {
+        case APP_UART_DATA_READY:
+            UNUSED_VARIABLE(app_uart_get(&data_array[index]));
+            index++;
+
+            if ((data_array[index - 1] == '\n') || (index >= (BLE_NUS_MAX_DATA_LEN)))
+            {
+                err_code = ble_nus_string_send(&m_nus, data_array, index);
+                if (err_code != NRF_ERROR_INVALID_STATE)
+                {
+                   APP_ERROR_CHECK(err_code);
+                }
+                printf("local: received the uart data!!\r\n");
+
+
+                index = 0;
+            }
+            break;
+
+        case APP_UART_COMMUNICATION_ERROR:
+            APP_ERROR_HANDLER(p_event->data.error_communication);
+            break;
+
+        case APP_UART_FIFO_ERROR:
+            APP_ERROR_HANDLER(p_event->data.error_code);
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+
+
+
+
+void local_uart_init(void)
+{
+    uint32_t                     err_code;
+    const app_uart_comm_params_t comm_params =
+    {
+        RX_PIN_NUMBER,
+        TX_PIN_NUMBER,
+        RTS_PIN_NUMBER,
+        CTS_PIN_NUMBER,
+        APP_UART_FLOW_CONTROL_DISABLED,
+        false,
+        UART_BAUDRATE_BAUDRATE_Baud115200
+    };
+
+    APP_UART_FIFO_INIT( &comm_params,
+                       UART_RX_BUF_SIZE,
+                       UART_TX_BUF_SIZE,
+                       uart_event_handle,
+                       APP_IRQ_PRIORITY_LOW,
+                       err_code);
+    APP_ERROR_CHECK(err_code);
+}
 
 /**@brief Function for application main entry.
  */
@@ -589,9 +699,30 @@ int main(void)
     bool erase_bonds;
 
     // Initialize.
+
+
     timers_init();//定时器初始化
-    buttons_leds_init(&erase_bonds);//按键和LED灯初始化
-	
+
+    local_led_init();
+    local_uart_init();
+
+
+    //buttons_leds_init(&erase_bonds);//按键和LED灯初始化
+    //uart_init();
+
+    printf("\r\nUART Start!\r\n");
+    printf("\r\nlocal: uart1 init success!!\r\n");
+
+    while(1)
+    {
+        LEDS_ON(HEART_LED);
+        nrf_delay_ms(500);
+        LEDS_OFF(HEART_LED);
+        nrf_delay_ms(500);
+    }
+
+
+
     ble_stack_init();//蓝牙协议栈初始化
     device_manager_init(erase_bonds);//设备管理初始化
     gap_params_init();//GAP参数初始化
@@ -604,12 +735,15 @@ int main(void)
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);//开始广播
     APP_ERROR_CHECK(err_code);
 
+
+
     // Enter main loop.
     for (;;)
     {
         power_manage();
     }
 }
+
 
 /**
  * @}
