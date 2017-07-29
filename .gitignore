@@ -1,3 +1,11 @@
+# BUILD KEIL PRO FILE
+# *.uvgui
+# *.uvopt
+# *.uvproj
+# *.ewd
+# *.ewp
+# *.eww
+
 # Prerequisites
 *.d
 
