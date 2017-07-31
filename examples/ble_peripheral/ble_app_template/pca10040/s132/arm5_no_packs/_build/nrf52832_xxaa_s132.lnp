@@ -14,6 +14,7 @@
 ".\_build\nrf_drv_uart.o"
 ".\_build\pstorage.o"
 ".\_build\app_uart_fifo.o"
+".\_build\nrf_drv_timer.o"
 ".\_build\app_button.o"
 ".\_build\app_error.o"
 ".\_build\app_error_weak.o"

@@ -55,7 +55,7 @@
 #include "nrf_delay.h"
 #include "app_uart.h"
 #include "ble_nus.h"
-
+#include "nrf_drv_timer.h"
 
 
 
@@ -110,9 +110,10 @@ static ble_yy_service_t                     m_yys;
 
 static ble_nus_t                        m_nus;
 
+//APP_TIMER_DEF(m_log_timer);                                                         /* log printf timer define*/
+//#define LOG_TIMER_INTERVAL              APP_TIMER_TICKS(100,APP_TIMER_PRESCALER)   /* log timer  pre 5sec */
 
-
-
+const nrf_drv_timer_t  LOG_TIMER        = NRF_DRV_TIMER_INSTANCE(0);
 
 
 //////////////////////////////////////////////
@@ -145,22 +146,6 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
  *
  * @details Initializes the timer module. This creates and starts application timers.
  */
-static void timers_init(void)
-{
-
-    // Initialize timer module.初始化定时器模式
-    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
-
-    // Create timers.
-
-    /* YOUR_JOB: Create any timers to be used by the application.
-                 Below is an example of how to create a timer.
-                 For every new timer needed, increase the value of the macro APP_TIMER_MAX_TIMERS by
-                 one.
-    uint32_t err_code;
-    err_code = app_timer_create(&m_app_timer_id, APP_TIMER_MODE_REPEATED, timer_timeout_handler);
-    APP_ERROR_CHECK(err_code); */
-}
 
 
 /**@brief Function for the GAP initialization.
@@ -307,16 +292,7 @@ static void conn_params_init(void)
 }
 
 
-/**@brief Function for starting timers.
-*/
-static void application_timers_start(void)
-{
-    /* YOUR_JOB: Start your timers. below is an example of how to start a timer.
-    uint32_t err_code;
-    err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
-    APP_ERROR_CHECK(err_code); */
 
-}
 
 
 /**@brief Function for putting the chip into sleep mode.
@@ -609,21 +585,25 @@ static void power_manage(void)
     APP_ERROR_CHECK(err_code);
 }
 
+//////////////////////////////////////////////////
+//
+//              LED
+//
+//
+//////////////////////////////////////////////////
+
 void local_led_init(void)
 {
     LEDS_CONFIGURE(HEART_LED);
     LEDS_OFF(HEART_LED);
 }
 
+///////////////////////////////////////////////////
+//
+//      uart
+//
+//////////////////////////////////////////////////
 
-/**@brief   Function for handling app_uart events.
- *
- * @details This function will receive a single character from the app_uart module and append it to
- *          a string. The string will be be sent over BLE when the last character received was a
- *          'new line' i.e '\n' (hex 0x0D) or if the string has reached a length of
- *          @ref NUS_MAX_DATA_LENGTH.
- */
-/**@snippet [Handling the data received over UART] */
 void uart_event_handle(app_uart_evt_t * p_event)
 {
     static uint8_t data_array[BLE_NUS_MAX_DATA_LEN];
@@ -644,8 +624,6 @@ void uart_event_handle(app_uart_evt_t * p_event)
                    APP_ERROR_CHECK(err_code);
                 }
                 printf("local: received the uart data!!\r\n");
-
-
                 index = 0;
             }
             break;
@@ -662,10 +640,6 @@ void uart_event_handle(app_uart_evt_t * p_event)
             break;
     }
 }
-
-
-
-
 
 
 void local_uart_init(void)
@@ -691,6 +665,78 @@ void local_uart_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+
+
+
+////////////////////////////////////////
+//
+//
+//  TIMER
+//
+//
+///////////////////////////////////
+
+static void application_timers_start(void)
+{
+    uint32_t err_code;
+    // Start log timers.
+//    err_code = app_timer_start(m_log_timer, LOG_TIMER_INTERVAL, NULL);
+  //  APP_ERROR_CHECK(err_code);
+}
+
+//////////////////////
+
+static void log_printf(void)
+{
+    printf("\r\nlocal: time out !!\r\n");
+}
+
+void log_timer_timeout_handler(nrf_timer_event_t event_type, void* p_context)
+{
+    UNUSED_PARAMETER(p_context);
+
+    switch (event_type)
+    {
+        case NRF_TIMER_EVENT_COMPARE0:
+            log_printf();
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+static void timers_init(void)
+{
+    uint32_t err_code = NRF_SUCCESS;
+    uint32_t timer_ticks = 0;
+
+    // Initialize timer module.初始化定时器模式
+    //APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
+
+		err_code = nrf_drv_timer_init(&LOG_TIMER,
+                                    NULL,
+                                    log_timer_timeout_handler);
+    APP_ERROR_CHECK(err_code);
+
+
+    timer_ticks = nrf_drv_timer_ms_to_ticks(&LOG_TIMER, 1000);
+		
+		
+		nrf_drv_timer_extended_compare(&LOG_TIMER,
+                                    NRF_TIMER_CC_CHANNEL0,
+                                    timer_ticks,
+                                    NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK,
+                                    true);
+
+    nrf_drv_timer_enable(&LOG_TIMER);
+
+}
+
+
+
+
 /**@brief Function for application main entry.
  */
 int main(void)
@@ -709,7 +755,7 @@ int main(void)
 
     //buttons_leds_init(&erase_bonds);//按键和LED灯初始化
     //uart_init();
-
+		printf("----------------------BT_LOCK----------------------------");
     printf("\r\nUART Start!\r\n");
     printf("\r\nlocal: uart1 init success!!\r\n");
 
@@ -721,8 +767,6 @@ int main(void)
         nrf_delay_ms(500);
     }
 
-
-
     ble_stack_init();//蓝牙协议栈初始化
     device_manager_init(erase_bonds);//设备管理初始化
     gap_params_init();//GAP参数初始化
@@ -731,7 +775,7 @@ int main(void)
     conn_params_init();//更新过程初始化
 
     // Start execution.
-    application_timers_start();//定时器开始计时
+
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);//开始广播
     APP_ERROR_CHECK(err_code);
 

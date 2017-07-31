@@ -45,7 +45,7 @@
 #endif
 
 /* TIMER */
-#define TIMER0_ENABLED 0
+#define TIMER0_ENABLED 1
 
 #if (TIMER0_ENABLED == 1)
 #define TIMER0_CONFIG_FREQUENCY    NRF_TIMER_FREQ_16MHz
@@ -56,7 +56,7 @@
 #define TIMER0_INSTANCE_INDEX      0
 #endif
 
-#define TIMER1_ENABLED 0
+#define TIMER1_ENABLED 1
 
 #if (TIMER1_ENABLED == 1)
 #define TIMER1_CONFIG_FREQUENCY    NRF_TIMER_FREQ_16MHz
@@ -66,7 +66,7 @@
 
 #define TIMER1_INSTANCE_INDEX      (TIMER0_ENABLED)
 #endif
- 
+
 #define TIMER2_ENABLED 0
 
 #if (TIMER2_ENABLED == 1)
