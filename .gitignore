@@ -7,7 +7,7 @@
  *.eww
  *.tags
  *.tags1
-
+*.crf
 
 # Prerequisites
 *.d

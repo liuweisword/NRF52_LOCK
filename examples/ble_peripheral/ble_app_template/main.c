@@ -56,7 +56,7 @@
 #include "app_uart.h"
 #include "ble_nus.h"
 #include "nrf_drv_timer.h"
-
+#include "nrf_drv_gpiote.h"
 
 
 
@@ -65,7 +65,7 @@
 #define CENTRAL_LINK_COUNT               0                                          /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT            1                                          /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
 
-#define DEVICE_NAME                      "Nordic_Template"                          /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                      "Nordic_liuwei"                          /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME                "NordicSemiconductor"                      /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                 300                                        /**< The advertising interval (in units of 0.625 ms. This value corresponds to 25 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS       180                                        /**< The advertising timeout in units of seconds. */
@@ -104,18 +104,22 @@ static ble_yy_service_t                     m_yys;
 
 //////////////////////////////////////////////////////////////////////
 
-#define HEART_LED       BSP_LED_3_MASK
+#define EVENT_LED                       BSP_LED_2_MASK
+#define HEART_LED                       BSP_LED_3_MASK
+
+#define LOCAL_BUTTON3                   BSP_BUTTON_3_MASK
+
 #define UART_TX_BUF_SIZE                256                                         /**< UART TX buffer size. */
 #define UART_RX_BUF_SIZE                256                                         /**< UART RX buffer size. */
 
 static ble_nus_t                        m_nus;
 
-//APP_TIMER_DEF(m_log_timer);                                                         /* log printf timer define*/
+APP_TIMER_DEF(m_log_timer);                                                         /* log printf timer define*/
 //#define LOG_TIMER_INTERVAL              APP_TIMER_TICKS(100,APP_TIMER_PRESCALER)   /* log timer  pre 5sec */
 
-const nrf_drv_timer_t  LOG_TIMER        = NRF_DRV_TIMER_INSTANCE(0);
+//const nrf_drv_timer_t  LOG_TIMER        = NRF_DRV_TIMER_INSTANCE(0);
 
-
+const nrf_drv_timer_t LOG_TIMER = NRF_DRV_TIMER_INSTANCE(1);
 //////////////////////////////////////////////
 
 
@@ -410,9 +414,8 @@ static void ble_stack_init(void)
     uint32_t err_code;
 
     nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
-
-    // Initialize the SoftDevice handler module.初始化系统时钟与相关参数
     SOFTDEVICE_HANDLER_INIT(&clock_lf_cfg, NULL);
+
     //获取默认启动SoftDevice参数
     ble_enable_params_t ble_enable_params;
     err_code = softdevice_enable_get_default_config(CENTRAL_LINK_COUNT,
@@ -594,8 +597,8 @@ static void power_manage(void)
 
 void local_led_init(void)
 {
-    LEDS_CONFIGURE(HEART_LED);
-    LEDS_OFF(HEART_LED);
+    LEDS_CONFIGURE(HEART_LED | EVENT_LED);
+    LEDS_OFF(HEART_LED | EVENT_LED);
 }
 
 ///////////////////////////////////////////////////
@@ -676,63 +679,76 @@ void local_uart_init(void)
 //
 ///////////////////////////////////
 
-static void application_timers_start(void)
-{
-    uint32_t err_code;
-    // Start log timers.
+//static void application_timers_start(void)
+//{
+//    uint32_t err_code;
+// 		Start log timers.
 //    err_code = app_timer_start(m_log_timer, LOG_TIMER_INTERVAL, NULL);
-  //  APP_ERROR_CHECK(err_code);
-}
+//  	APP_ERROR_CHECK(err_code);
+//}
 
 //////////////////////
 
-static void log_printf(void)
+//void log_printf(void * p_context)
+void log_printf()
 {
-    printf("\r\nlocal: time out !!\r\n");
+    printf("\r\nlocal: log time out !!\r\n");
+    LEDS_INVERT(EVENT_LED);
 }
 
-void log_timer_timeout_handler(nrf_timer_event_t event_type, void* p_context)
-{
-    UNUSED_PARAMETER(p_context);
-
-    switch (event_type)
-    {
-        case NRF_TIMER_EVENT_COMPARE0:
-            log_printf();
-            break;
-
-        default:
-            break;
-    }
-}
-
-
-static void timers_init(void)
+static void local_timer_init(void)
 {
     uint32_t err_code = NRF_SUCCESS;
-    uint32_t timer_ticks = 0;
-
-    // Initialize timer module.初始化定时器模式
-    //APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
-
-		err_code = nrf_drv_timer_init(&LOG_TIMER,
-                                    NULL,
-                                    log_timer_timeout_handler);
+    err_code = app_timer_create(&m_log_timer,
+                                APP_TIMER_MODE_REPEATED,
+                                log_printf);
     APP_ERROR_CHECK(err_code);
 
+    err_code = app_timer_start(m_log_timer,
+                                APP_TIMER_TICKS(1000,APP_TIMER_PRESCALER),
+                                NULL);
+	APP_ERROR_CHECK(err_code);
+}
 
-    timer_ticks = nrf_drv_timer_ms_to_ticks(&LOG_TIMER, 1000);
-		
-		
-		nrf_drv_timer_extended_compare(&LOG_TIMER,
-                                    NRF_TIMER_CC_CHANNEL0,
-                                    timer_ticks,
-                                    NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK,
-                                    true);
+void local_button3_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+    nrf_drv_gpiote_out_toggle(EVENT_LED);
+}
 
-    nrf_drv_timer_enable(&LOG_TIMER);
+static void local_button_led_init(void)
+{
+//    ret_code_t err_code = NRF_SUCCESS;
+
+//    err_code = nrf_drv_gpiote_init();
+//    APP_ERROR_CHECK(err_code);
+
+		//while(1){printf("\r\ntest\r\n");}
+//    nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(true);   // low active
+//	err_code = nrf_drv_gpiote_out_init(EVENT_LED, &out_config);
+//	APP_ERROR_CHECK(err_code);
+
+
+
+//    nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
+//    in_config.pull = NRF_GPIO_PIN_PULLUP;
+
+//    err_code = nrf_drv_gpiote_in_init(LOCAL_BUTTON3, &in_config, local_button3_handler);
+//    APP_ERROR_CHECK(err_code);
+
+//    nrf_drv_gpiote_in_event_enable(LOCAL_BUTTON3, true);
 
 }
+
+
+
+
+void system_clock_init(void)
+{
+    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
+}
+
+
+
 
 
 
@@ -745,29 +761,29 @@ int main(void)
     bool erase_bonds;
 
     // Initialize.
+    system_clock_init();
 
+    ble_stack_init();                                                           //蓝牙协议栈初始化
 
-    timers_init();//定时器初始化
-
-    local_led_init();
-    local_uart_init();
-
+    local_led_init();                                                           //init heart led3
+    local_uart_init();                                                          //init uart1
+    local_timer_init();                                                         //init timer
+//    local_button_led_init();                                                    //init button3 init  toggle led2
 
     //buttons_leds_init(&erase_bonds);//按键和LED灯初始化
-    //uart_init();
-		printf("----------------------BT_LOCK----------------------------");
+	printf("----------------------BT_LOCK----------------------------");
     printf("\r\nUART Start!\r\n");
     printf("\r\nlocal: uart1 init success!!\r\n");
 
     while(1)
     {
-        LEDS_ON(HEART_LED);
+        LEDS_INVERT(HEART_LED);
         nrf_delay_ms(500);
-        LEDS_OFF(HEART_LED);
+        LEDS_INVERT(HEART_LED);
         nrf_delay_ms(500);
     }
+    /*
 
-    ble_stack_init();//蓝牙协议栈初始化
     device_manager_init(erase_bonds);//设备管理初始化
     gap_params_init();//GAP参数初始化
     advertising_init();//广播初始化
@@ -786,6 +802,7 @@ int main(void)
     {
         power_manage();
     }
+    */
 }
 
 

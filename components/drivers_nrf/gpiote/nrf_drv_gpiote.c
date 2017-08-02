@@ -188,7 +188,7 @@ void nrf_drv_gpiote_uninit(void)
     m_cb.state = NRF_DRV_STATE_UNINITIALIZED;
 }
 
-ret_code_t nrf_drv_gpiote_out_init(nrf_drv_gpiote_pin_t pin, 
+ret_code_t nrf_drv_gpiote_out_init(nrf_drv_gpiote_pin_t pin,
                                    nrf_drv_gpiote_out_config_t const * p_config)
 {
     ASSERT(pin < NUMBER_OF_PINS);
@@ -231,7 +231,7 @@ ret_code_t nrf_drv_gpiote_out_init(nrf_drv_gpiote_pin_t pin,
             {
                 nrf_gpio_pin_clear(pin);
             }
-            
+
             nrf_gpio_cfg_output(pin);
         }
     }
@@ -303,7 +303,7 @@ uint32_t nrf_drv_gpiote_out_task_addr_get(nrf_drv_gpiote_pin_t pin)
 {
     ASSERT(pin < NUMBER_OF_PINS);
     ASSERT(pin_in_use_by_te(pin));
-    
+
     nrf_gpiote_tasks_t task = TE_IDX_TO_TASK_ADDR(channel_port_get(pin));
     return nrf_gpiote_task_addr_get(task);
 }
@@ -313,7 +313,7 @@ void nrf_drv_gpiote_out_task_force(nrf_drv_gpiote_pin_t pin, uint8_t state)
     ASSERT(pin < NUMBER_OF_PINS);
     ASSERT(pin_in_use(pin));
     ASSERT(pin_in_use_by_te(pin));
-    
+
     nrf_gpiote_outinit_t init_val = state ? NRF_GPIOTE_INITIAL_VALUE_HIGH : NRF_GPIOTE_INITIAL_VALUE_LOW;
     nrf_gpiote_task_force(m_cb.pin_assignments[pin], init_val);
 }
@@ -396,7 +396,7 @@ void nrf_drv_gpiote_in_event_enable(nrf_drv_gpiote_pin_t pin, bool int_enable)
     {
         int32_t channel = (int32_t)channel_port_get(pin);
         nrf_gpiote_events_t event = TE_IDX_TO_EVENT_ADDR(channel);
-       
+
         nrf_gpiote_event_enable(channel);
 
         nrf_gpiote_event_clear(event);
@@ -452,7 +452,7 @@ uint32_t nrf_drv_gpiote_in_event_addr_get(nrf_drv_gpiote_pin_t pin)
 {
     ASSERT(pin < NUMBER_OF_PINS);
     ASSERT(pin_in_use_by_te(pin));
-    
+
     nrf_gpiote_events_t event = TE_IDX_TO_EVENT_ADDR(channel_port_get(pin));
     return nrf_gpiote_event_addr_get(event);
 }

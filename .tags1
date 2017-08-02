@@ -31,35 +31,39 @@ SEC_PARAM_MAX_KEY_SIZE	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\b
 DEAD_BEEF	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^#define DEAD_BEEF /;"	macro	line:94	file:
 m_app_handle	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static dm_application_instance_t         m_app_handle;                              \/**< Application identifier allocated by device manager *\/$/;"	variable	line:96	file:
 m_conn_handle	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static uint16_t                          m_conn_handle = BLE_CONN_HANDLE_INVALID;   \/**< Handle of the current connection. *\/$/;"	variable	line:98	file:
-HEART_LED	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^#define HEART_LED /;"	macro	line:107	file:
-UART_TX_BUF_SIZE	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^#define UART_TX_BUF_SIZE /;"	macro	line:108	file:
-UART_RX_BUF_SIZE	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^#define UART_RX_BUF_SIZE /;"	macro	line:109	file:
-m_nus	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static ble_nus_t                        m_nus;$/;"	variable	line:111	file:
-LOG_TIMER	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^const nrf_drv_timer_t  LOG_TIMER        = NRF_DRV_TIMER_INSTANCE(1);$/;"	variable	line:116
-m_adv_uuids	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}}; \/**< Universally unique service identifiers. *\/$/;"	variable	line:125	file:
-assert_nrf_callback	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)$/;"	function	line:139	signature:(uint16_t line_num, const uint8_t * p_file_name)
-gap_params_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void gap_params_init(void)$/;"	function	line:156	file:	signature:(void)
-services_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void services_init(void)$/;"	function	line:212	file:	signature:(void)
-on_conn_params_evt	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)$/;"	function	line:250	file:	signature:(ble_conn_params_evt_t * p_evt)
-conn_params_error_handler	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void conn_params_error_handler(uint32_t nrf_error)$/;"	function	line:266	file:	signature:(uint32_t nrf_error)
-conn_params_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void conn_params_init(void)$/;"	function	line:274	file:	signature:(void)
-sleep_mode_enter	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void sleep_mode_enter(void)$/;"	function	line:302	file:	signature:(void)
-on_adv_evt	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void on_adv_evt(ble_adv_evt_t ble_adv_evt)$/;"	function	line:323	file:	signature:(ble_adv_evt_t ble_adv_evt)
-on_ble_evt	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void on_ble_evt(ble_evt_t * p_ble_evt)$/;"	function	line:346	file:	signature:(ble_evt_t * p_ble_evt)
-ble_evt_dispatch	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void ble_evt_dispatch(ble_evt_t * p_ble_evt)$/;"	function	line:376	file:	signature:(ble_evt_t * p_ble_evt)
-sys_evt_dispatch	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void sys_evt_dispatch(uint32_t sys_evt)$/;"	function	line:397	file:	signature:(uint32_t sys_evt)
-ble_stack_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void ble_stack_init(void)$/;"	function	line:408	file:	signature:(void)
-bsp_event_handler	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void bsp_event_handler(bsp_event_t event)$/;"	function	line:444	signature:(bsp_event_t event)
-device_manager_evt_handler	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static uint32_t device_manager_evt_handler(dm_handle_t const * p_handle,$/;"	function	line:479	file:	signature:(dm_handle_t const * p_handle, dm_event_t const * p_event, ret_code_t event_result)
-device_manager_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void device_manager_init(bool erase_bonds)$/;"	function	line:501	file:	signature:(bool erase_bonds)
-advertising_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void advertising_init(void)$/;"	function	line:534	file:	signature:(void)
-buttons_leds_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void buttons_leds_init(bool * p_erase_bonds)$/;"	function	line:562	file:	signature:(bool * p_erase_bonds)
-power_manage	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void power_manage(void)$/;"	function	line:582	file:	signature:(void)
-local_led_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void local_led_init(void)$/;"	function	line:595	signature:(void)
-uart_event_handle	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void uart_event_handle(app_uart_evt_t * p_event)$/;"	function	line:607	signature:(app_uart_evt_t * p_event)
-local_uart_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void local_uart_init(void)$/;"	function	line:645	signature:(void)
-application_timers_start	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void application_timers_start(void)$/;"	function	line:679	file:	signature:(void)
-log_printf	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void log_printf(void)$/;"	function	line:689	file:	signature:(void)
-log_timer_timeout_handler	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void log_timer_timeout_handler(nrf_timer_event_t event_type, void* p_context)$/;"	function	line:694	signature:(nrf_timer_event_t event_type, void* p_context)
-timers_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void timers_init(void)$/;"	function	line:710	file:	signature:(void)
-main	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^int main(void)$/;"	function	line:742	signature:(void)
+EVENT_LED	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^#define EVENT_LED /;"	macro	line:107	file:
+HEART_LED	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^#define HEART_LED /;"	macro	line:108	file:
+LOCAL_BUTTON3	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^#define LOCAL_BUTTON3 /;"	macro	line:110	file:
+UART_TX_BUF_SIZE	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^#define UART_TX_BUF_SIZE /;"	macro	line:112	file:
+UART_RX_BUF_SIZE	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^#define UART_RX_BUF_SIZE /;"	macro	line:113	file:
+m_nus	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static ble_nus_t                        m_nus;$/;"	variable	line:115	file:
+m_log_timer	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^APP_TIMER_DEF(m_log_timer);                                                         \/* log printf timer define*\/$/;"	variable	line:117
+LOG_TIMER	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^const nrf_drv_timer_t LOG_TIMER = NRF_DRV_TIMER_INSTANCE(1);$/;"	variable	line:122
+m_adv_uuids	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}}; \/**< Universally unique service identifiers. *\/$/;"	variable	line:129	file:
+assert_nrf_callback	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)$/;"	function	line:143	signature:(uint16_t line_num, const uint8_t * p_file_name)
+gap_params_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void gap_params_init(void)$/;"	function	line:160	file:	signature:(void)
+services_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void services_init(void)$/;"	function	line:216	file:	signature:(void)
+on_conn_params_evt	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)$/;"	function	line:254	file:	signature:(ble_conn_params_evt_t * p_evt)
+conn_params_error_handler	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void conn_params_error_handler(uint32_t nrf_error)$/;"	function	line:270	file:	signature:(uint32_t nrf_error)
+conn_params_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void conn_params_init(void)$/;"	function	line:278	file:	signature:(void)
+sleep_mode_enter	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void sleep_mode_enter(void)$/;"	function	line:306	file:	signature:(void)
+on_adv_evt	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void on_adv_evt(ble_adv_evt_t ble_adv_evt)$/;"	function	line:327	file:	signature:(ble_adv_evt_t ble_adv_evt)
+on_ble_evt	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void on_ble_evt(ble_evt_t * p_ble_evt)$/;"	function	line:350	file:	signature:(ble_evt_t * p_ble_evt)
+ble_evt_dispatch	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void ble_evt_dispatch(ble_evt_t * p_ble_evt)$/;"	function	line:380	file:	signature:(ble_evt_t * p_ble_evt)
+sys_evt_dispatch	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void sys_evt_dispatch(uint32_t sys_evt)$/;"	function	line:401	file:	signature:(uint32_t sys_evt)
+ble_stack_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void ble_stack_init(void)$/;"	function	line:412	file:	signature:(void)
+bsp_event_handler	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void bsp_event_handler(bsp_event_t event)$/;"	function	line:447	signature:(bsp_event_t event)
+device_manager_evt_handler	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static uint32_t device_manager_evt_handler(dm_handle_t const * p_handle,$/;"	function	line:482	file:	signature:(dm_handle_t const * p_handle, dm_event_t const * p_event, ret_code_t event_result)
+device_manager_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void device_manager_init(bool erase_bonds)$/;"	function	line:504	file:	signature:(bool erase_bonds)
+advertising_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void advertising_init(void)$/;"	function	line:537	file:	signature:(void)
+buttons_leds_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void buttons_leds_init(bool * p_erase_bonds)$/;"	function	line:565	file:	signature:(bool * p_erase_bonds)
+power_manage	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void power_manage(void)$/;"	function	line:585	file:	signature:(void)
+local_led_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void local_led_init(void)$/;"	function	line:598	signature:(void)
+uart_event_handle	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void uart_event_handle(app_uart_evt_t * p_event)$/;"	function	line:610	signature:(app_uart_evt_t * p_event)
+local_uart_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void local_uart_init(void)$/;"	function	line:648	signature:(void)
+log_printf	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void log_printf()$/;"	function	line:693
+local_timer_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void local_timer_init(void)$/;"	function	line:699	file:	signature:(void)
+local_button3_handler	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void local_button3_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)$/;"	function	line:713	signature:(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+local_button_led_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^static void local_button_led_init(void)$/;"	function	line:718	file:	signature:(void)
+system_clock_init	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^void system_clock_init(void)$/;"	function	line:745	signature:(void)
+main	D:\MYWORK\nRF52 DK\BTLOCK_NRF52\examples\ble_peripheral\ble_app_template\main.c	/^int main(void)$/;"	function	line:758	signature:(void)

@@ -175,7 +175,7 @@ static __INLINE void app_error_print(uint32_t id, uint32_t pc, uint32_t info)
 #define APP_ERROR_CHECK(ERR_CODE)                           \
     do                                                      \
     {                                                       \
-        const uint32_t LOCAL_ERR_CODE = (ERR_CODE);         \
+				const uint32_t LOCAL_ERR_CODE = (ERR_CODE);         \
         if (LOCAL_ERR_CODE != NRF_SUCCESS)                  \
         {                                                   \
             APP_ERROR_HANDLER(LOCAL_ERR_CODE);              \
