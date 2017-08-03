@@ -41,7 +41,7 @@ static uint32_t m_pin_transition;
 static void detection_delay_timeout_handler(void * p_context)
 {
     uint8_t i;
-    
+
     // Pushed button(s) detected, execute button handler(s).
     for (i = 0; i < m_button_count; i++)
     {
@@ -111,7 +111,7 @@ uint32_t app_button_init(app_button_cfg_t *             p_buttons,
                          uint32_t                       detection_delay)
 {
     uint32_t err_code;
-    
+
     if (detection_delay < APP_TIMER_MIN_TIMEOUT_TICKS)
     {
         return NRF_ERROR_INVALID_PARAM;
@@ -130,14 +130,14 @@ uint32_t app_button_init(app_button_cfg_t *             p_buttons,
 
     m_pin_state      = 0;
     m_pin_transition = 0;
-    
+
     while (button_count--)
     {
         app_button_cfg_t * p_btn = &p_buttons[button_count];
 
         nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false);
         config.pull = p_btn->pull_cfg;
-        
+
         err_code = nrf_drv_gpiote_in_init(p_btn->pin_no, &config, gpiote_event_handler);
         VERIFY_SUCCESS(err_code);
     }
@@ -186,6 +186,6 @@ uint32_t app_button_is_pushed(uint8_t button_id, bool * p_is_pushed)
     bool is_set = nrf_drv_gpiote_in_is_set(p_btn->pin_no);
 
     *p_is_pushed = !(is_set^(p_btn->active_state == APP_BUTTON_ACTIVE_HIGH));
-    
+
     return NRF_SUCCESS;
 }

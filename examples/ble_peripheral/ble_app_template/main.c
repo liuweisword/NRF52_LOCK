@@ -413,9 +413,6 @@ static void ble_stack_init(void)
 {
     uint32_t err_code;
 
-    nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
-    SOFTDEVICE_HANDLER_INIT(&clock_lf_cfg, NULL);
-
     //获取默认启动SoftDevice参数
     ble_enable_params_t ble_enable_params;
     err_code = softdevice_enable_get_default_config(CENTRAL_LINK_COUNT,
@@ -672,36 +669,24 @@ void local_uart_init(void)
 
 
 ////////////////////////////////////////
-//
-//
 //  TIMER
-//
-//
 ///////////////////////////////////
 
-//static void application_timers_start(void)
-//{
-//    uint32_t err_code;
-// 		Start log timers.
-//    err_code = app_timer_start(m_log_timer, LOG_TIMER_INTERVAL, NULL);
-//  	APP_ERROR_CHECK(err_code);
-//}
-
-//////////////////////
-
 //void log_printf(void * p_context)
-void log_printf()
+void heart_1sec()
 {
-    printf("\r\nlocal: log time out !!\r\n");
-    LEDS_INVERT(EVENT_LED);
+    LEDS_INVERT(HEART_LED);
 }
+
+
+
 
 static void local_timer_init(void)
 {
     uint32_t err_code = NRF_SUCCESS;
     err_code = app_timer_create(&m_log_timer,
                                 APP_TIMER_MODE_REPEATED,
-                                log_printf);
+                                heart_1sec);
     APP_ERROR_CHECK(err_code);
 
     err_code = app_timer_start(m_log_timer,
@@ -710,46 +695,50 @@ static void local_timer_init(void)
 	APP_ERROR_CHECK(err_code);
 }
 
-void local_button3_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+void local_button_handler(bsp_event_t event)
 {
-    nrf_drv_gpiote_out_toggle(EVENT_LED);
+    uint32_t err_code;
+    switch (event)
+    {
+        case BSP_EVENT_KEY_0:
+            LEDS_INVERT(EVENT_LED);
+            break;
+
+        case BSP_EVENT_KEY_1:
+            LEDS_INVERT(EVENT_LED);
+            break;
+
+        case BSP_EVENT_KEY_2:
+            LEDS_INVERT(EVENT_LED);
+            break;
+
+        case BSP_EVENT_KEY_3:
+            LEDS_INVERT(EVENT_LED);
+            break;
+
+        default:
+            break;
+    }
 }
 
-static void local_button_led_init(void)
+static void local_button_init(void)
 {
-//    ret_code_t err_code = NRF_SUCCESS;
-
-//    err_code = nrf_drv_gpiote_init();
-//    APP_ERROR_CHECK(err_code);
-
-		//while(1){printf("\r\ntest\r\n");}
-//    nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(true);   // low active
-//	err_code = nrf_drv_gpiote_out_init(EVENT_LED, &out_config);
-//	APP_ERROR_CHECK(err_code);
-
-
-
-//    nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-//    in_config.pull = NRF_GPIO_PIN_PULLUP;
-
-//    err_code = nrf_drv_gpiote_in_init(LOCAL_BUTTON3, &in_config, local_button3_handler);
-//    APP_ERROR_CHECK(err_code);
-
-//    nrf_drv_gpiote_in_event_enable(LOCAL_BUTTON3, true);
-
+    uint32_t err_code = bsp_init(BSP_INIT_BUTTONS,
+                                 APP_TIMER_TICKS(100, APP_TIMER_PRESCALER),
+                                 local_button_handler);
+    APP_ERROR_CHECK(err_code);
 }
-
-
 
 
 void system_clock_init(void)
 {
+
     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_OP_QUEUE_SIZE, false);
+
+    nrf_clock_lf_cfg_t clock_lf_cfg = NRF_CLOCK_LFCLKSRC;
+    SOFTDEVICE_HANDLER_INIT(&clock_lf_cfg, NULL);
+
 }
-
-
-
-
 
 
 
@@ -763,12 +752,10 @@ int main(void)
     // Initialize.
     system_clock_init();
 
-    ble_stack_init();                                                           //蓝牙协议栈初始化
-
     local_led_init();                                                           //init heart led3
     local_uart_init();                                                          //init uart1
     local_timer_init();                                                         //init timer
-//    local_button_led_init();                                                    //init button3 init  toggle led2
+    local_button_init();                                                    //init button3 init  toggle led2
 
     //buttons_leds_init(&erase_bonds);//按键和LED灯初始化
 	printf("----------------------BT_LOCK----------------------------");
@@ -777,13 +764,13 @@ int main(void)
 
     while(1)
     {
-        LEDS_INVERT(HEART_LED);
-        nrf_delay_ms(500);
-        LEDS_INVERT(HEART_LED);
-        nrf_delay_ms(500);
+        printf("\r\nlocal: pc end!!\r\n");
+        nrf_delay_ms(5000);
     }
-    /*
 
+
+    /*
+    ble_stack_init();                                                           //蓝牙协议栈初始化
     device_manager_init(erase_bonds);//设备管理初始化
     gap_params_init();//GAP参数初始化
     advertising_init();//广播初始化

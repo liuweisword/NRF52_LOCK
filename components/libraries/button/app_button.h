@@ -65,7 +65,7 @@ typedef struct
     uint32_t high_to_low;   /**Pin went from high to low */
     uint32_t low_to_high;   /**Pin went from low to high */
 } pin_transition_t;
-    
+
 /**@brief Function for initializing the Buttons.
  *
  * @details This function will initialize the specified pins as buttons, and configure the Button
@@ -73,7 +73,7 @@ typedef struct
  *
  * @note Normally initialization should be done using the APP_BUTTON_INIT() macro
  *
- * @note app_button_enable() function must be called in order to enable the button detection.    
+ * @note app_button_enable() function must be called in order to enable the button detection.
  *
  * @param[in]  p_buttons           Array of buttons to be used (NOTE: Must be static!).
  * @param[in]  button_count        Number of buttons.
