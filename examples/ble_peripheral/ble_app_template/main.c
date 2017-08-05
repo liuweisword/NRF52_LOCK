@@ -115,9 +115,6 @@ static ble_yy_service_t                     m_yys;
 static ble_nus_t                        m_nus;
 
 APP_TIMER_DEF(m_log_timer);                                                         /* log printf timer define*/
-//#define LOG_TIMER_INTERVAL              APP_TIMER_TICKS(100,APP_TIMER_PRESCALER)   /* log timer  pre 5sec */
-
-//const nrf_drv_timer_t  LOG_TIMER        = NRF_DRV_TIMER_INSTANCE(0);
 
 const nrf_drv_timer_t LOG_TIMER = NRF_DRV_TIMER_INSTANCE(1);
 //////////////////////////////////////////////
@@ -213,8 +210,36 @@ static void on_yys_evt(ble_yy_service_t     * p_yy_service,
 
 /**@brief Function for initializing services that will be used by the application.
  */
+ static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length)
+ {
+     for (uint32_t i = 0; i < length; i++)
+     {
+         while(app_uart_put(p_data[i]) != NRF_SUCCESS);
+     }
+     while(app_uart_put('\r') != NRF_SUCCESS);
+     while(app_uart_put('\n') != NRF_SUCCESS);
+
+     if(((p_data[0] == 'l') && (p_data[1] == 'e') && (p_data[2] == 'd'))
+        || ((p_data[0] == 'L') && (p_data[1] == 'E') && (p_data[2] == 'D')))
+     {
+         LEDS_INVERT(EVENT_LED);
+     }
+ }
+
+
+
 static void services_init(void)
 {
+    uint32_t       err_code;
+    ble_nus_init_t nus_init;
+
+    memset(&nus_init, 0, sizeof(nus_init));
+
+    nus_init.data_handler = nus_data_handler;
+
+    err_code = ble_nus_init(&m_nus, &nus_init);
+    APP_ERROR_CHECK(err_code);
+
     /* YOUR_JOB: Add code to initialize the services used by the application.
     uint32_t                           err_code;
     ble_xxs_init_t                     xxs_init;
@@ -352,20 +377,34 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
     uint32_t err_code;
 
     switch (p_ble_evt->header.evt_id)
-            {
-        case BLE_GAP_EVT_CONNECTED:
-            err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
-            APP_ERROR_CHECK(err_code);
-            m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-            break;
+    {
+      case BLE_GAP_EVT_CONNECTED:
+          err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
+          APP_ERROR_CHECK(err_code);
+          m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+          break;
 
-        case BLE_GAP_EVT_DISCONNECTED:
-            m_conn_handle = BLE_CONN_HANDLE_INVALID;
-            break;
+      case BLE_GAP_EVT_DISCONNECTED:
+          err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+          APP_ERROR_CHECK(err_code);
+          m_conn_handle = BLE_CONN_HANDLE_INVALID;
+          break;
 
-        default:
-            // No implementation needed.
-            break;
+      case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
+          // Pairing not supported
+          err_code = sd_ble_gap_sec_params_reply(m_conn_handle, BLE_GAP_SEC_STATUS_PAIRING_NOT_SUPP, NULL, NULL);
+          APP_ERROR_CHECK(err_code);
+          break;
+
+      case BLE_GATTS_EVT_SYS_ATTR_MISSING:
+          // No system attributes have been stored.
+          err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0);
+          APP_ERROR_CHECK(err_code);
+          break;
+
+      default:
+          // No implementation needed.
+          break;
     }
 }
 
@@ -379,11 +418,14 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
  */
 static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
+
     dm_ble_evt_handler(p_ble_evt);
+
     ble_conn_params_on_ble_evt(p_ble_evt);
-    bsp_btn_ble_on_ble_evt(p_ble_evt);
+    ble_nus_on_ble_evt(&m_nus, p_ble_evt);
     on_ble_evt(p_ble_evt);
     ble_advertising_on_ble_evt(p_ble_evt);
+    //bsp_btn_ble_on_ble_evt(p_ble_evt);
     /*YOUR_JOB add calls to _on_ble_evt functions from each service your application is using
     ble_xxs_on_ble_evt(&m_xxs, p_ble_evt);
     ble_yys_on_ble_evt(&m_yys, p_ble_evt);
@@ -431,7 +473,7 @@ static void ble_stack_init(void)
     err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
     APP_ERROR_CHECK(err_code);
 
-    // Register with the SoftDevice handler module for BLE events.系统事件
+    // Register with the SoftDevice handler module for BLE events.系统事件       // 功能暂不明
     err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
     APP_ERROR_CHECK(err_code);
 }
@@ -535,22 +577,24 @@ static void advertising_init(void)
 {
     uint32_t      err_code;
     ble_advdata_t advdata;
+    ble_advdata_t scanrsp;
 
     // Build advertising data struct to pass into @ref ble_advertising_init.
     memset(&advdata, 0, sizeof(advdata));
+    advdata.name_type          = BLE_ADVDATA_FULL_NAME;
+    advdata.include_appearance = false;
+    advdata.flags              = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
 
-    advdata.name_type               = BLE_ADVDATA_FULL_NAME;//广播时的名称显示
-    advdata.include_appearance      = true;
-    advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;//蓝牙设备模式
-    advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);//UUID
-    advdata.uuids_complete.p_uuids  = m_adv_uuids;
+    memset(&scanrsp, 0, sizeof(scanrsp));
+    scanrsp.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
+    scanrsp.uuids_complete.p_uuids  = m_adv_uuids;
 
     ble_adv_modes_config_t options = {0};
-    options.ble_adv_fast_enabled  = BLE_ADV_FAST_ENABLED;//广播类型
-    options.ble_adv_fast_interval = APP_ADV_INTERVAL;//广播间隔
-    options.ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;//广播超时
+    options.ble_adv_fast_enabled  = BLE_ADV_FAST_ENABLED;
+    options.ble_adv_fast_interval = APP_ADV_INTERVAL;
+    options.ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;
 
-    err_code = ble_advertising_init(&advdata, NULL, &options, on_adv_evt, NULL);//广播参数
+    err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -559,6 +603,7 @@ static void advertising_init(void)
  *
  * @param[out] p_erase_bonds  Will be true if the clear bonding button was pressed to wake the application up.
  */
+/*
 static void buttons_leds_init(bool * p_erase_bonds)
 {
     bsp_event_t startup_event;
@@ -575,7 +620,7 @@ static void buttons_leds_init(bool * p_erase_bonds)
 
     *p_erase_bonds = (startup_event == BSP_EVENT_CLEAR_BONDING_DATA);
 }
-
+*/
 
 /**@brief Function for the Power manager.
  */
@@ -623,7 +668,6 @@ void uart_event_handle(app_uart_evt_t * p_event)
                 {
                    APP_ERROR_CHECK(err_code);
                 }
-                printf("local: received the uart data!!\r\n");
                 index = 0;
             }
             break;
@@ -639,6 +683,7 @@ void uart_event_handle(app_uart_evt_t * p_event)
         default:
             break;
     }
+
 }
 
 
@@ -651,7 +696,7 @@ void local_uart_init(void)
         TX_PIN_NUMBER,
         RTS_PIN_NUMBER,
         CTS_PIN_NUMBER,
-        APP_UART_FLOW_CONTROL_DISABLED,
+        APP_UART_FLOW_CONTROL_ENABLED,
         false,
         UART_BAUDRATE_BAUDRATE_Baud115200
     };
@@ -673,7 +718,7 @@ void local_uart_init(void)
 ///////////////////////////////////
 
 //void log_printf(void * p_context)
-void heart_1sec()
+void heart_1sec(void * p_context)
 {
     LEDS_INVERT(HEART_LED);
 }
@@ -697,7 +742,6 @@ static void local_timer_init(void)
 
 void local_button_handler(bsp_event_t event)
 {
-    uint32_t err_code;
     switch (event)
     {
         case BSP_EVENT_KEY_0:
@@ -762,34 +806,24 @@ int main(void)
     printf("\r\nUART Start!\r\n");
     printf("\r\nlocal: uart1 init success!!\r\n");
 
-    while(1)
-    {
-        printf("\r\nlocal: pc end!!\r\n");
-        nrf_delay_ms(5000);
-    }
+    ble_stack_init();
+    device_manager_init(erase_bonds);                                           //设备管理初始化
+    gap_params_init();                                                          //GAP参数初始化
+    services_init();                                                            //服务初始化
+    advertising_init();                                                         //广播初始化
+    conn_params_init();                                                         //更新过程初始化
 
-
-    /*
-    ble_stack_init();                                                           //蓝牙协议栈初始化
-    device_manager_init(erase_bonds);//设备管理初始化
-    gap_params_init();//GAP参数初始化
-    advertising_init();//广播初始化
-    services_init();//服务初始化
-    conn_params_init();//更新过程初始化
-
-    // Start execution.
-
-    err_code = ble_advertising_start(BLE_ADV_MODE_FAST);//开始广播
+    err_code = ble_advertising_start(BLE_ADV_MODE_FAST);                        //开始广播
     APP_ERROR_CHECK(err_code);
 
 
-
+    printf("\r\nlocal: pc end!!\r\n");
     // Enter main loop.
     for (;;)
     {
         power_manage();
     }
-    */
+
 }
 
 
